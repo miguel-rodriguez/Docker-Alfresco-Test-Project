@@ -1,0 +1,61 @@
+version: '2' 
+
+networks:
+  alfNet:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+      com.docker.network.bridge.enable_ip_masquerade: "false"
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.238.0/24
+        gateway: 172.16.238.1
+
+services:
+  alf-content-store:
+    build: 
+      /opt/docker-projects/alf-content-store
+    image: alf-content-store:latest
+    tty: true
+  
+  lb-server:
+    image: httpd:2.4
+    networks:
+      alfNet:
+        ipv4_address: 172.16.238.10
+    volumes:
+      - /opt/docker-projects/httpd-centos/httpd.conf:/usr/local/apache2/conf/httpd.conf:rw
+      - /opt/docker-projects/httpd-centos/server.crt:/usr/local/apache2/conf/server.crt:rw
+      - /opt/docker-projects/httpd-centos/server.key:/usr/local/apache2/conf/server.key:rw 
+    extra_hosts:
+      - "alfresco1:172.16.238.12"
+    ports:
+      - 80:80      
+    tty: true
+
+  mysql-acs52:
+    build: 
+      /opt/docker-projects/mysql-acs52
+    image: mysql:acs52
+    networks:
+      alfNet:
+        ipv4_address: 172.16.238.11
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin
+    tty: true
+
+  alfresco1:
+    build: 
+      /opt/docker-projects/alfresco-acs52
+    image: alfresco:acs5s2
+    networks:
+      alfNet:
+        ipv4_address: 172.16.238.12
+    volumes_from:
+      - alf-content-store
+    extra_hosts:
+      - "db-server:172.16.238.11"      
+      - "lb-server:172.16.238.10"      
+    tty: true
+

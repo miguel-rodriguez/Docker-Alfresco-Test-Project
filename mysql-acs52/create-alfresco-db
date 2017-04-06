@@ -1,0 +1,2 @@
+create database alfresco;
+grant all privileges on alfresco.* to alfresco@'%' identified by 'admin';

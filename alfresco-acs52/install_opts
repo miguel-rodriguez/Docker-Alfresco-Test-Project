@@ -1,0 +1,18 @@
+mode=unattended
+enable-components=javaalfresco,aosmodule,libreofficecomponent,alfrescosolr4
+disable-components=postgres
+
+# Use JDBC settings for an existing database
+jdbc_database=alfresco
+jdbc_username=alfresco
+jdbc_password=admin
+jdbc_driver=org.gjt.mm.mysql.Driver
+jdbc_url=jdbc:mysql://db-server:3306/alfresco?useUnicode=yes&characterEncoding=UTF-8 
+
+# Install location
+prefix=/opt/alfresco-acs52
+
+alfresco_admin_password=admin
+
+# Don't install init scripts
+baseunixservice_install_as_service=1
